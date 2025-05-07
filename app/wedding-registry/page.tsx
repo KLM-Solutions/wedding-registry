@@ -743,7 +743,7 @@ export default function WeddingRegistry() {
 
       {/* Guest Details Modal */}
       <Dialog open={!!selectedGuest} onOpenChange={() => setSelectedGuest(null)}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="w-[90%] max-w-[350px] mx-auto rounded-2xl">
           <DialogHeader>
             <DialogTitle className="text-2xl font-serif text-red-600">Guest Details</DialogTitle>
             <DialogDescription>
@@ -754,7 +754,7 @@ export default function WeddingRegistry() {
             <div className="space-y-4">
               <div className="flex items-center space-x-4">
                 {selectedGuest.photo_url ? (
-                  <div className="relative w-20 h-20 rounded-full overflow-hidden">
+                  <div className="relative w-16 h-16 rounded-full overflow-hidden">
                     <Image
                       src={selectedGuest.photo_url}
                       alt={`Photo of ${selectedGuest.name}`}
@@ -763,12 +763,12 @@ export default function WeddingRegistry() {
                     />
                   </div>
                 ) : (
-                  <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center">
-                    <span className="text-3xl font-medium text-gray-500">{selectedGuest.name.charAt(0)}</span>
+                  <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center">
+                    <span className="text-2xl font-medium text-gray-500">{selectedGuest.name.charAt(0)}</span>
                   </div>
                 )}
                 <div>
-                  <h3 className="text-xl font-semibold">{selectedGuest.name}</h3>
+                  <h3 className="text-lg font-semibold">{selectedGuest.name}</h3>
                   <p className="text-sm text-gray-600">Registered on {new Date(selectedGuest.created_at).toLocaleDateString()}</p>
                 </div>
               </div>
@@ -776,15 +776,15 @@ export default function WeddingRegistry() {
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
                   <span className="font-medium">Email:</span>
-                  <span className="text-gray-600">{selectedGuest.email}</span>
+                  <span className="text-gray-600 text-sm">{selectedGuest.email}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <span className="font-medium">Phone:</span>
-                  <span className="text-gray-600">{selectedGuest.phone}</span>
+                  <span className="text-gray-600 text-sm">{selectedGuest.phone}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <span className="font-medium">Connection:</span>
-                  <span className="text-gray-600">
+                  <span className="text-gray-600 text-sm">
                     {selectedGuest.association === "bride" ? "Bride" : "Groom"} → {selectedGuest.connection}
                   </span>
                 </div>
@@ -793,7 +793,7 @@ export default function WeddingRegistry() {
               {selectedGuest.message && (
                 <div className="pt-4 border-t">
                   <h4 className="font-medium mb-2">Message for the Couple:</h4>
-                  <p className="text-gray-600 italic">"{selectedGuest.message}"</p>
+                  <p className="text-sm italic text-gray-600">"{selectedGuest.message}"</p>
                 </div>
               )}
             </div>
