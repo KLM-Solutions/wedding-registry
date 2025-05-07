@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { toast } from "sonner"
 import { Toaster } from "@/components/ui/sonner"
-import { Heart, Users, UserPlus, Camera, Calendar, MapPin, Clock, X } from "lucide-react"
+import { Heart, Users, UserPlus, Camera, Calendar, MapPin, Clock, X, CalendarDays, Phone } from "lucide-react"
 import Image from "next/image"
 import {
   Dialog,
@@ -38,6 +38,22 @@ interface HeartPosition {
   isDragging: boolean
 }
 
+interface Event {
+  time: string
+  title: string
+  location?: string
+}
+
+interface DaySchedule {
+  date: string
+  events: Event[]
+}
+
+interface Hotel {
+  name: string
+  phone: string
+}
+
 export default function WeddingRegistry() {
   const [formData, setFormData] = useState({
     name: "",
@@ -55,6 +71,45 @@ export default function WeddingRegistry() {
   const [hearts, setHearts] = useState<HeartPosition[]>([])
   const [selectedConnection, setSelectedConnection] = useState<{name: string, side: 'bride' | 'groom'} | null>(null)
   const [selectedGuest, setSelectedGuest] = useState<Guest | null>(null)
+
+  const schedule: DaySchedule[] = [
+    {
+      date: "May 16th",
+      events: [
+        { time: "6:00 AM - 9:00 AM", title: "Panthakal, Pooja and Breakfast" },
+        { time: "1:00 PM - 2:00 PM", title: "Lunch" },
+        { time: "4:00 PM - 5:00 PM", title: "Haldi" },
+        { time: "5:00 PM - 6:00 PM", title: "Mehendi" },
+        { time: "6:00 PM - 8:00 PM", title: "Sangeeth" },
+        { time: "8:00 PM onwards", title: "Dinner" },
+      ],
+    },
+    {
+      date: "May 17th",
+      events: [
+        { time: "Morning", title: "Breakfast and Stay at Hotel" },
+        { time: "Afternoon", title: "Lunch at Aalayamani" },
+        { time: "5:00 PM", title: "Barat" },
+        { time: "6:00 PM onwards", title: "Reception with Dinner and DJ" },
+      ],
+    },
+    {
+      date: "May 18th",
+      events: [
+        { time: "6:00 AM - 7:15 AM", title: "Muhurtham" },
+        { time: "7:15 AM onwards", title: "Breakfast" },
+        { time: "12:00 PM", title: "Lunch" },
+      ],
+    },
+  ]
+
+  const hotels: Hotel[] = [
+    { name: "Hotel D'wafer", phone: "9489026222" },
+    { name: "Hotel Turmeric", phone: "9063770000" },
+    { name: "Hotel Varshan", phone: "9842815005" },
+    { name: "Hotel Deepa", phone: "9585803636" },
+    { name: "MKR Homestay", phone: "6380700287" },
+  ]
 
   useEffect(() => {
     // Initialize hearts with random positions
@@ -283,6 +338,13 @@ export default function WeddingRegistry() {
             >
               <Users className="w-4 h-4 mr-2" />
               Guest List
+            </TabsTrigger>
+            <TabsTrigger 
+              value="events" 
+              className="px-6 py-3 rounded-full text-sm md:text-base data-[state=active]:bg-red-600 data-[state=active]:text-white transition-all duration-200 hover:bg-red-50"
+            >
+              <CalendarDays className="w-4 h-4 mr-2" />
+              Events
             </TabsTrigger>
           </TabsList>
 
@@ -570,6 +632,105 @@ export default function WeddingRegistry() {
                       <p className="text-gray-500">No guests have registered yet.</p>
                     </div>
                   )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="events">
+            <Card className="border-0 shadow-lg">
+              <CardHeader className="bg-red-50 rounded-t-lg">
+                <CardTitle className="text-2xl text-red-800">Wedding Events</CardTitle>
+                <CardDescription className="text-red-700">Join us in celebrating our special moments</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-8 md:grid-cols-2">
+                  {/* Schedule Section */}
+                  <div className="space-y-8">
+                    <h2 className="text-2xl font-serif text-red-800 mb-6">Event Schedule</h2>
+                    {schedule.map((day, dayIndex) => (
+                      <div key={dayIndex} className="relative">
+                        {/* Day Header */}
+                        <div className="flex items-center mb-6">
+                          <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mr-4">
+                            <Calendar className="w-6 h-6 text-red-600" />
+                          </div>
+                          <h3 className="text-xl font-serif text-red-800">{day.date}</h3>
+                        </div>
+
+                        {/* Timeline */}
+                        <div className="relative pl-12">
+                          {/* Vertical Line */}
+                          <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-red-200"></div>
+
+                          {day.events.map((event, eventIndex) => (
+                            <div key={eventIndex} className="relative mb-8 last:mb-0">
+                              {/* Timeline Dot */}
+                              <div className="absolute left-[-2.5rem] w-5 h-5 rounded-full bg-red-100 border-4 border-red-200"></div>
+
+                              {/* Event Card */}
+                              <div className="bg-white rounded-lg shadow-sm p-4 border border-red-100 hover:shadow-md transition-shadow duration-200">
+                                <div className="flex items-start space-x-4">
+                                  <div className="flex-shrink-0">
+                                    <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center">
+                                      <Clock className="w-5 h-5 text-red-600" />
+                                    </div>
+                                  </div>
+                                  <div className="flex-1">
+                                    <div className="text-sm font-medium text-red-600 mb-1">
+                                      {event.time}
+                                    </div>
+                                    <h4 className="font-medium text-gray-900">{event.title}</h4>
+                                    {event.location && (
+                                      <div className="flex items-center text-sm text-gray-600 mt-2">
+                                        <MapPin className="w-4 h-4 mr-1" />
+                                        {event.location}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Hotels Section */}
+                  <div className="space-y-6">
+                    <h2 className="text-2xl font-serif text-red-800 mb-6">Accommodation</h2>
+                    <Card className="border-red-200">
+                      <CardHeader className="bg-red-50">
+                        <CardTitle className="text-xl text-red-800">Stay at Hotel Contacts</CardTitle>
+                        <CardDescription className="text-red-600">Book your stay at any of these hotels</CardDescription>
+                      </CardHeader>
+                      <CardContent className="pt-6">
+                        <div className="space-y-4">
+                          {hotels.map((hotel, index) => (
+                            <div 
+                              key={index} 
+                              className="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
+                            >
+                              <div className="flex items-center space-x-3">
+                                <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center">
+                                  <span className="text-red-600 font-medium">{hotel.name.charAt(0)}</span>
+                                </div>
+                                <h3 className="font-medium text-gray-900">{hotel.name}</h3>
+                              </div>
+                              <a
+                                href={`tel:${hotel.phone}`}
+                                className="flex items-center text-red-600 hover:text-red-700 transition-colors"
+                              >
+                                <Phone className="w-4 h-4 mr-2" />
+                                <span>{hotel.phone}</span>
+                              </a>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
                 </div>
               </CardContent>
             </Card>
