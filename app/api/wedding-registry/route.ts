@@ -106,27 +106,13 @@ export async function POST(request: NextRequest) {
     
     if (photo && photo.size > 0) {
       try {
-        // Create unique filename
-        const filename = `${uuidv4()}-${photo.name.replace(/\s/g, '_')}`;
-        const uploadDir = join(process.cwd(), 'public', 'uploads');
-        const photoPath = join(uploadDir, filename);
-        
-        // Ensure uploads directory exists
-        if (!existsSync(uploadDir)) {
-          await mkdir(uploadDir, { recursive: true });
-          console.log("Created uploads directory:", uploadDir);
-        }
-        
-        try {
-          await writeFile(photoPath, Buffer.from(await photo.arrayBuffer()));
-          photoUrl = `/uploads/${filename}`;
-          console.log("Photo saved successfully:", photoPath);
-        } catch (error) {
-          console.error("Error saving photo:", error);
-          // Continue without photo if there's an error
-        }
+        // Convert image to base64
+        const arrayBuffer = await photo.arrayBuffer()
+        const buffer = Buffer.from(arrayBuffer)
+        photoUrl = `data:${photo.type};base64,${buffer.toString('base64')}`
+        console.log("Photo converted to base64 successfully")
       } catch (error) {
-        console.error("Error processing photo:", error);
+        console.error("Error converting photo to base64:", error)
         // Continue without photo if there's an error
       }
     }
