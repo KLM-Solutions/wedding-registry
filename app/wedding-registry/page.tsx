@@ -726,8 +726,8 @@ export default function WeddingRegistry() {
                             className="p-4 border rounded-lg bg-white shadow-sm cursor-pointer hover:shadow-md transition-shadow duration-200"
                             onClick={() => setSelectedGuest(guest)}
                           >
-                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                              <div className="flex items-start gap-4 w-full sm:w-auto">
+                            <div className="flex flex-col gap-4">
+                              <div className="flex items-start gap-4">
                                 {guest.photo_url ? (
                                   <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
                                     <Image
@@ -745,7 +745,7 @@ export default function WeddingRegistry() {
                                 <div className="flex-1 min-w-0">
                                   <h4 className="font-semibold text-lg truncate">{guest.name}</h4>
                                   <p className="text-sm text-gray-600 truncate">
-                                    {guest.email} • {guest.phone}
+                                    {guest.email}
                                   </p>
                                   <div className="mt-2 flex flex-wrap items-center gap-2">
                                     <span
@@ -762,15 +762,21 @@ export default function WeddingRegistry() {
                                   </div>
                                 </div>
                               </div>
-                              <div className="text-right w-full sm:w-auto">
+                              
+                              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                                <div className="flex items-center text-sm text-gray-600">
+                                  <Phone className="w-4 h-4 mr-2" />
+                                  <span className="truncate">{guest.phone}</span>
+                                </div>
                                 <p className="text-xs text-gray-500">{new Date(guest.created_at).toLocaleDateString()}</p>
                               </div>
+
+                              {guest.message && (
+                                <div className="pt-3 border-t">
+                                  <p className="text-sm italic text-gray-600 line-clamp-2">"{guest.message}"</p>
+                                </div>
+                              )}
                             </div>
-                            {guest.message && (
-                              <div className="mt-3 pt-3 border-t">
-                                <p className="text-sm italic text-gray-600 line-clamp-2">"{guest.message}"</p>
-                              </div>
-                            )}
                           </div>
                         ))}
                     </div>
