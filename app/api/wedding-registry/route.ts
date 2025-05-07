@@ -25,6 +25,8 @@ async function initializeDatabase() {
         connection VARCHAR(50) NOT NULL,
         message TEXT,
         photo_url TEXT,
+        date_of_birth DATE,
+        location TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `)
@@ -67,6 +69,8 @@ export async function POST(request: NextRequest) {
     const association = formData.get("association") as string
     const connection = formData.get("connection") as string
     const message = formData.get("message") as string || ""
+    const dateOfBirth = formData.get("date_of_birth") as string
+    const location = formData.get("location") as string
     
     // Validate required fields
     const requiredFields = [
@@ -121,10 +125,10 @@ export async function POST(request: NextRequest) {
     try {
       // Insert guest data
       const result = await client.query(
-        `INSERT INTO guests (name, email, phone, association, connection, message, photo_url)
-         VALUES ($1, $2, $3, $4, $5, $6, $7)
+        `INSERT INTO guests (name, email, phone, association, connection, message, photo_url, date_of_birth, location)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
          RETURNING *`,
-        [name, email, phone, association, connection, message, photoUrl],
+        [name, email, phone, association, connection, message, photoUrl, dateOfBirth, location],
       )
 
       return NextResponse.json(result.rows[0])

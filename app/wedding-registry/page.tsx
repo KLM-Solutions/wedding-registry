@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -28,6 +28,8 @@ interface Guest {
   connection: string
   message: string
   photo_url?: string
+  date_of_birth?: string
+  location?: string
   created_at: string
 }
 
@@ -54,6 +56,12 @@ interface Hotel {
   phone: string
 }
 
+interface LocationSuggestion {
+  display_name: string
+  lat: string
+  lon: string
+}
+
 export default function WeddingRegistry() {
   const [formData, setFormData] = useState({
     name: "",
@@ -62,6 +70,8 @@ export default function WeddingRegistry() {
     association: "",
     connection: "",
     message: "",
+    date_of_birth: "",
+    location: "",
   })
   const [photoFile, setPhotoFile] = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
@@ -71,6 +81,10 @@ export default function WeddingRegistry() {
   const [hearts, setHearts] = useState<HeartPosition[]>([])
   const [selectedConnection, setSelectedConnection] = useState<{name: string, side: 'bride' | 'groom'} | null>(null)
   const [selectedGuest, setSelectedGuest] = useState<Guest | null>(null)
+  const [locationSuggestions, setLocationSuggestions] = useState<LocationSuggestion[]>([])
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [locationInputValue, setLocationInputValue] = useState("")
+  const locationInputRef = useRef<HTMLInputElement>(null)
 
   const schedule: DaySchedule[] = [
     {
@@ -120,6 +134,71 @@ export default function WeddingRegistry() {
       isDragging: false
     }))
     setHearts(initialHearts)
+  }, [])
+
+  // Debounce function for location search
+  const debounce = (func: Function, wait: number) => {
+    let timeout: NodeJS.Timeout
+    return (...args: any[]) => {
+      clearTimeout(timeout)
+      timeout = setTimeout(() => func(...args), wait)
+    }
+  }
+
+  // Fetch location suggestions
+  const fetchLocationSuggestions = async (query: string) => {
+    if (!query || query.length < 3) {
+      setLocationSuggestions([])
+      return
+    }
+
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`
+      )
+      const data = await response.json()
+      setLocationSuggestions(data)
+    } catch (error) {
+      console.error('Error fetching location suggestions:', error)
+      setLocationSuggestions([])
+    }
+  }
+
+  // Debounced version of fetchLocationSuggestions
+  const debouncedFetchSuggestions = useCallback(
+    debounce(fetchLocationSuggestions, 300),
+    []
+  )
+
+  // Handle location input change
+  const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setLocationInputValue(value)
+    setFormData(prev => ({ ...prev, location: value }))
+    debouncedFetchSuggestions(value)
+    setShowSuggestions(true)
+  }
+
+  // Handle location suggestion selection
+  const handleSuggestionSelect = (suggestion: LocationSuggestion) => {
+    setLocationInputValue(suggestion.display_name)
+    setFormData(prev => ({ ...prev, location: suggestion.display_name }))
+    setLocationSuggestions([])
+    setShowSuggestions(false)
+  }
+
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (locationInputRef.current && !locationInputRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
   }, [])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -192,6 +271,8 @@ export default function WeddingRegistry() {
           association: "",
           connection: "",
           message: "",
+          date_of_birth: "",
+          location: "",
         })
         setPhotoFile(null)
         setPhotoPreview(null)
@@ -393,6 +474,69 @@ export default function WeddingRegistry() {
                         onChange={handleInputChange}
                         required
                       />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="date_of_birth">Date of Birth</Label>
+                      <Input
+                        id="date_of_birth"
+                        name="date_of_birth"
+                        type="date"
+                        value={formData.date_of_birth}
+                        onChange={handleInputChange}
+                        required
+                        className="bg-white"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="location">Location</Label>
+                      <div className="relative" ref={locationInputRef}>
+                        <Input
+                          id="location"
+                          name="location"
+                          placeholder="Enter your location"
+                          value={locationInputValue}
+                          onChange={handleLocationChange}
+                          required
+                          className="bg-white"
+                          onFocus={(e) => {
+                            if (navigator.geolocation) {
+                              navigator.geolocation.getCurrentPosition(
+                                (position) => {
+                                  const { latitude, longitude } = position.coords;
+                                  fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`)
+                                    .then(response => response.json())
+                                    .then(data => {
+                                      if (data.display_name) {
+                                        setLocationInputValue(data.display_name);
+                                        setFormData(prev => ({
+                                          ...prev,
+                                          location: data.display_name
+                                        }));
+                                      }
+                                    })
+                                    .catch(error => console.error('Error getting location:', error));
+                                },
+                                (error) => {
+                                  console.error('Error getting location:', error);
+                                }
+                              );
+                            }
+                          }}
+                        />
+                        {showSuggestions && locationSuggestions.length > 0 && (
+                          <div className="absolute z-10 w-full mt-1 bg-white rounded-md shadow-lg max-h-60 overflow-auto">
+                            {locationSuggestions.map((suggestion, index) => (
+                              <div
+                                key={index}
+                                className="px-4 py-2 hover:bg-red-50 cursor-pointer text-sm"
+                                onClick={() => handleSuggestionSelect(suggestion)}
+                              >
+                                {suggestion.display_name}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="association">Association</Label>
