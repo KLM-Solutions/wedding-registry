@@ -237,7 +237,7 @@ export default function WeddingRegistry() {
                   </div>
                   <div className="flex items-center justify-center space-x-2">
                     <Clock className="w-5 h-5" />
-                    <span>10:00 AM</span>
+                    <span>06:00 AM</span>
                   </div>
                   <div className="col-span-2 flex items-center justify-center space-x-2">
                     <MapPin className="w-5 h-5" />
