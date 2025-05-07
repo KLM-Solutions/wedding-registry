@@ -9,8 +9,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { toast } from "sonner"
 import { Toaster } from "@/components/ui/sonner"
-import { Heart, Users, UserPlus, Camera, Calendar, MapPin, Clock } from "lucide-react"
+import { Heart, Users, UserPlus, Camera, Calendar, MapPin, Clock, X } from "lucide-react"
 import Image from "next/image"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "../../components/ui/dialog"
 
 interface Guest {
   id: number
@@ -46,6 +53,8 @@ export default function WeddingRegistry() {
   const [activeTab, setActiveTab] = useState("register")
   const [guestList, setGuestList] = useState<Guest[]>([])
   const [hearts, setHearts] = useState<HeartPosition[]>([])
+  const [selectedConnection, setSelectedConnection] = useState<{name: string, side: 'bride' | 'groom'} | null>(null)
+  const [selectedGuest, setSelectedGuest] = useState<Guest | null>(null)
 
   useEffect(() => {
     // Initialize hearts with random positions
@@ -431,7 +440,10 @@ export default function WeddingRegistry() {
                       <div className="flex justify-center gap-40 mb-8">
                         {/* Bride Side */}
                         <div className="text-center">
-                          <div className="w-32 h-32 mx-auto mb-2 rounded-full bg-red-100 flex items-center justify-center animate-float">
+                          <div 
+                            className={`w-32 h-32 mx-auto mb-2 rounded-full bg-red-100 flex items-center justify-center animate-float cursor-pointer transition-all duration-200 ${selectedConnection?.name === 'Harini' ? 'ring-4 ring-red-400' : ''}`}
+                            onClick={() => setSelectedConnection(selectedConnection?.name === 'Harini' ? null : {name: 'Harini', side: 'bride'})}
+                          >
                             <span className="text-2xl font-bold text-red-600">Harini</span>
                           </div>
                           <p className="font-semibold text-slate-800">Bride</p>
@@ -439,7 +451,10 @@ export default function WeddingRegistry() {
                           <div className="mt-8 grid grid-cols-5 gap-4">
                             {["Kalyani", "Kalyan", "Anjan", "Raji", "Harini"].map((name) => (
                               <div key={name} className="text-center">
-                                <div className="w-16 h-16 mx-auto mb-2 rounded-full bg-red-50 flex items-center justify-center hover:scale-110 transition-transform duration-200">
+                                <div 
+                                  className={`w-16 h-16 mx-auto mb-2 rounded-full bg-red-50 flex items-center justify-center hover:scale-110 transition-transform duration-200 cursor-pointer ${selectedConnection?.name === name ? 'ring-4 ring-red-400' : ''}`}
+                                  onClick={() => setSelectedConnection(selectedConnection?.name === name ? null : {name, side: 'bride'})}
+                                >
                                   <span className="text-sm font-medium text-red-600">{name}</span>
                                 </div>
                                 <p className="text-xs text-slate-600">
@@ -453,7 +468,10 @@ export default function WeddingRegistry() {
 
                         {/* Groom Side */}
                         <div className="text-center">
-                          <div className="w-32 h-32 mx-auto mb-2 rounded-full bg-red-100 flex items-center justify-center animate-float-delayed">
+                          <div 
+                            className={`w-32 h-32 mx-auto mb-2 rounded-full bg-red-100 flex items-center justify-center animate-float-delayed cursor-pointer transition-all duration-200 ${selectedConnection?.name === 'Aditya' ? 'ring-4 ring-red-400' : ''}`}
+                            onClick={() => setSelectedConnection(selectedConnection?.name === 'Aditya' ? null : {name: 'Aditya', side: 'groom'})}
+                          >
                             <span className="text-2xl font-bold text-red-600">Aditya</span>
                           </div>
                           <p className="font-semibold text-slate-800">Groom</p>
@@ -461,7 +479,10 @@ export default function WeddingRegistry() {
                           <div className="mt-8 grid grid-cols-5 gap-4">
                             {["Ramesh", "Sushma", "Nirupama", "Abhijit", "Aditya"].map((name) => (
                               <div key={name} className="text-center">
-                                <div className="w-16 h-16 mx-auto mb-2 rounded-full bg-red-50 flex items-center justify-center hover:scale-110 transition-transform duration-200">
+                                <div 
+                                  className={`w-16 h-16 mx-auto mb-2 rounded-full bg-red-50 flex items-center justify-center hover:scale-110 transition-transform duration-200 cursor-pointer ${selectedConnection?.name === name ? 'ring-4 ring-red-400' : ''}`}
+                                  onClick={() => setSelectedConnection(selectedConnection?.name === name ? null : {name, side: 'groom'})}
+                                >
                                   <span className="text-sm font-medium text-red-600">{name}</span>
                                 </div>
                                 <p className="text-xs text-slate-600">
@@ -478,58 +499,71 @@ export default function WeddingRegistry() {
                 </div>
 
                 <div>
-                  <h3 className="text-xl font-semibold mb-4">Registered Guests</h3>
+                  <h3 className="text-xl font-semibold mb-4">
+                    {selectedConnection 
+                      ? `Guests Connected to ${selectedConnection.name} (${selectedConnection.side === 'bride' ? 'Bride' : 'Groom'}'s Side)`
+                      : 'Registered Guests'}
+                  </h3>
                   {guestList.length > 0 ? (
                     <div className="grid gap-4">
-                      {guestList.map((guest, index) => (
-                        <div key={index} className="p-4 border rounded-lg bg-white shadow-sm">
-                          <div className="flex items-start justify-between">
-                            <div className="flex">
-                              {guest.photo_url ? (
-                                <div className="relative w-12 h-12 rounded-full overflow-hidden mr-4">
-                                  <Image
-                                    src={guest.photo_url}
-                                    alt={`Photo of ${guest.name}`}
-                                    fill
-                                    style={{ objectFit: "cover" }}
-                                  />
-                                </div>
-                              ) : (
-                                <div className="w-12 h-12 rounded-full mr-4 bg-gray-100 flex items-center justify-center">
-                                  <span className="text-xl font-medium text-gray-500">{guest.name.charAt(0)}</span>
-                                </div>
-                              )}
-                              <div>
-                                <h4 className="font-semibold text-lg">{guest.name}</h4>
-                                <p className="text-sm text-gray-600">
-                                  {guest.email} • {guest.phone}
-                                </p>
-                                <div className="mt-2 flex items-center">
-                                  <span
-                                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                      guest.association === "bride"
-                                        ? "bg-red-100 text-red-800"
-                                        : "bg-red-100 text-red-800"
-                                    }`}
-                                  >
-                                    {guest.association === "bride" ? "Bride" : "Groom"}
-                                  </span>
-                                  <span className="mx-2 text-gray-400">→</span>
-                                  <span className="text-sm text-gray-700">{guest.connection}</span>
+                      {guestList
+                        .filter(guest => 
+                          !selectedConnection || 
+                          (guest.association === selectedConnection.side && guest.connection === selectedConnection.name)
+                        )
+                        .map((guest, index) => (
+                          <div 
+                            key={index} 
+                            className="p-4 border rounded-lg bg-white shadow-sm cursor-pointer hover:shadow-md transition-shadow duration-200"
+                            onClick={() => setSelectedGuest(guest)}
+                          >
+                            <div className="flex items-start justify-between">
+                              <div className="flex">
+                                {guest.photo_url ? (
+                                  <div className="relative w-12 h-12 rounded-full overflow-hidden mr-4">
+                                    <Image
+                                      src={guest.photo_url}
+                                      alt={`Photo of ${guest.name}`}
+                                      fill
+                                      style={{ objectFit: "cover" }}
+                                    />
+                                  </div>
+                                ) : (
+                                  <div className="w-12 h-12 rounded-full mr-4 bg-gray-100 flex items-center justify-center">
+                                    <span className="text-xl font-medium text-gray-500">{guest.name.charAt(0)}</span>
+                                  </div>
+                                )}
+                                <div>
+                                  <h4 className="font-semibold text-lg">{guest.name}</h4>
+                                  <p className="text-sm text-gray-600">
+                                    {guest.email} • {guest.phone}
+                                  </p>
+                                  <div className="mt-2 flex items-center">
+                                    <span
+                                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                        guest.association === "bride"
+                                          ? "bg-red-100 text-red-800"
+                                          : "bg-red-100 text-red-800"
+                                      }`}
+                                    >
+                                      {guest.association === "bride" ? "Bride" : "Groom"}
+                                    </span>
+                                    <span className="mx-2 text-gray-400">→</span>
+                                    <span className="text-sm text-gray-700">{guest.connection}</span>
+                                  </div>
                                 </div>
                               </div>
+                              <div className="text-right">
+                                <p className="text-xs text-gray-500">{new Date(guest.created_at).toLocaleDateString()}</p>
+                              </div>
                             </div>
-                            <div className="text-right">
-                              <p className="text-xs text-gray-500">{new Date(guest.created_at).toLocaleDateString()}</p>
-                            </div>
+                            {guest.message && (
+                              <div className="mt-3 pt-3 border-t">
+                                <p className="text-sm italic text-gray-600">"{guest.message}"</p>
+                              </div>
+                            )}
                           </div>
-                          {guest.message && (
-                            <div className="mt-3 pt-3 border-t">
-                              <p className="text-sm italic text-gray-600">"{guest.message}"</p>
-                            </div>
-                          )}
-                        </div>
-                      ))}
+                        ))}
                     </div>
                   ) : (
                     <div className="text-center py-8">
@@ -542,6 +576,67 @@ export default function WeddingRegistry() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Guest Details Modal */}
+      <Dialog open={!!selectedGuest} onOpenChange={() => setSelectedGuest(null)}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-serif text-red-600">Guest Details</DialogTitle>
+            <DialogDescription>
+              Information about {selectedGuest?.name}
+            </DialogDescription>
+          </DialogHeader>
+          {selectedGuest && (
+            <div className="space-y-4">
+              <div className="flex items-center space-x-4">
+                {selectedGuest.photo_url ? (
+                  <div className="relative w-20 h-20 rounded-full overflow-hidden">
+                    <Image
+                      src={selectedGuest.photo_url}
+                      alt={`Photo of ${selectedGuest.name}`}
+                      fill
+                      style={{ objectFit: "cover" }}
+                    />
+                  </div>
+                ) : (
+                  <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center">
+                    <span className="text-3xl font-medium text-gray-500">{selectedGuest.name.charAt(0)}</span>
+                  </div>
+                )}
+                <div>
+                  <h3 className="text-xl font-semibold">{selectedGuest.name}</h3>
+                  <p className="text-sm text-gray-600">Registered on {new Date(selectedGuest.created_at).toLocaleDateString()}</p>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <span className="font-medium">Email:</span>
+                  <span className="text-gray-600">{selectedGuest.email}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="font-medium">Phone:</span>
+                  <span className="text-gray-600">{selectedGuest.phone}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="font-medium">Connection:</span>
+                  <span className="text-gray-600">
+                    {selectedGuest.association === "bride" ? "Bride" : "Groom"} → {selectedGuest.connection}
+                  </span>
+                </div>
+              </div>
+
+              {selectedGuest.message && (
+                <div className="pt-4 border-t">
+                  <h4 className="font-medium mb-2">Message for the Couple:</h4>
+                  <p className="text-gray-600 italic">"{selectedGuest.message}"</p>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
       <Toaster />
     </div>
   )
