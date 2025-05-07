@@ -570,7 +570,7 @@ export default function WeddingRegistry() {
                       : 'Registered Guests'}
                   </h3>
                   {guestList.length > 0 ? (
-                    <div className="grid gap-4">
+                    <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                       {guestList
                         .filter(guest => 
                           !selectedConnection || 
@@ -582,10 +582,10 @@ export default function WeddingRegistry() {
                             className="p-4 border rounded-lg bg-white shadow-sm cursor-pointer hover:shadow-md transition-shadow duration-200"
                             onClick={() => setSelectedGuest(guest)}
                           >
-                            <div className="flex items-start justify-between">
-                              <div className="flex">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                              <div className="flex items-start gap-4 w-full sm:w-auto">
                                 {guest.photo_url ? (
-                                  <div className="relative w-12 h-12 rounded-full overflow-hidden mr-4">
+                                  <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
                                     <Image
                                       src={guest.photo_url}
                                       alt={`Photo of ${guest.name}`}
@@ -594,16 +594,16 @@ export default function WeddingRegistry() {
                                     />
                                   </div>
                                 ) : (
-                                  <div className="w-12 h-12 rounded-full mr-4 bg-gray-100 flex items-center justify-center">
+                                  <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
                                     <span className="text-xl font-medium text-gray-500">{guest.name.charAt(0)}</span>
                                   </div>
                                 )}
-                                <div>
-                                  <h4 className="font-semibold text-lg">{guest.name}</h4>
-                                  <p className="text-sm text-gray-600">
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="font-semibold text-lg truncate">{guest.name}</h4>
+                                  <p className="text-sm text-gray-600 truncate">
                                     {guest.email} • {guest.phone}
                                   </p>
-                                  <div className="mt-2 flex items-center">
+                                  <div className="mt-2 flex flex-wrap items-center gap-2">
                                     <span
                                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                                         guest.association === "bride"
@@ -613,18 +613,18 @@ export default function WeddingRegistry() {
                                     >
                                       {guest.association === "bride" ? "Bride" : "Groom"}
                                     </span>
-                                    <span className="mx-2 text-gray-400">→</span>
-                                    <span className="text-sm text-gray-700">{guest.connection}</span>
+                                    <span className="text-gray-400">→</span>
+                                    <span className="text-sm text-gray-700 truncate">{guest.connection}</span>
                                   </div>
                                 </div>
                               </div>
-                              <div className="text-right">
+                              <div className="text-right w-full sm:w-auto">
                                 <p className="text-xs text-gray-500">{new Date(guest.created_at).toLocaleDateString()}</p>
                               </div>
                             </div>
                             {guest.message && (
                               <div className="mt-3 pt-3 border-t">
-                                <p className="text-sm italic text-gray-600">"{guest.message}"</p>
+                                <p className="text-sm italic text-gray-600 line-clamp-2">"{guest.message}"</p>
                               </div>
                             )}
                           </div>
