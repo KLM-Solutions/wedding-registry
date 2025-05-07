@@ -324,27 +324,30 @@ export default function WeddingRegistry() {
         </header>
 
         <Tabs defaultValue="register" className="max-w-4xl mx-auto" onValueChange={handleTabChange}>
-          <TabsList className="flex justify-center space-x-2 mb-8 bg-transparent">
+          <TabsList className="flex flex-wrap justify-center gap-2 mb-8 bg-transparent">
             <TabsTrigger 
               value="register" 
-              className="px-6 py-3 rounded-full text-sm md:text-base data-[state=active]:bg-red-600 data-[state=active]:text-white transition-all duration-200 hover:bg-red-50"
+              className="flex-1 min-w-[120px] max-w-[200px] px-4 py-3 rounded-full text-sm md:text-base data-[state=active]:bg-red-600 data-[state=active]:text-white transition-all duration-200 hover:bg-red-50"
             >
-              <UserPlus className="w-4 h-4 mr-2" />
-              Register
+              <UserPlus className="w-4 h-4 mr-2 inline-block" />
+              <span className="hidden sm:inline">Register</span>
+              <span className="sm:hidden">Reg</span>
             </TabsTrigger>
             <TabsTrigger 
               value="guests" 
-              className="px-6 py-3 rounded-full text-sm md:text-base data-[state=active]:bg-red-600 data-[state=active]:text-white transition-all duration-200 hover:bg-red-50"
+              className="flex-1 min-w-[120px] max-w-[200px] px-4 py-3 rounded-full text-sm md:text-base data-[state=active]:bg-red-600 data-[state=active]:text-white transition-all duration-200 hover:bg-red-50"
             >
-              <Users className="w-4 h-4 mr-2" />
-              Guest List
+              <Users className="w-4 h-4 mr-2 inline-block" />
+              <span className="hidden sm:inline">Guest List</span>
+              <span className="sm:hidden">Guests</span>
             </TabsTrigger>
             <TabsTrigger 
               value="events" 
-              className="px-6 py-3 rounded-full text-sm md:text-base data-[state=active]:bg-red-600 data-[state=active]:text-white transition-all duration-200 hover:bg-red-50"
+              className="flex-1 min-w-[120px] max-w-[200px] px-4 py-3 rounded-full text-sm md:text-base data-[state=active]:bg-red-600 data-[state=active]:text-white transition-all duration-200 hover:bg-red-50"
             >
-              <CalendarDays className="w-4 h-4 mr-2" />
-              Events
+              <CalendarDays className="w-4 h-4 mr-2 inline-block" />
+              <span className="hidden sm:inline">Events</span>
+              <span className="sm:hidden">Events</span>
             </TabsTrigger>
           </TabsList>
 
