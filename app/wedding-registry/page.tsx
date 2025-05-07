@@ -353,7 +353,7 @@ export default function WeddingRegistry() {
 
           <TabsContent value="register">
             <Card className="border-0 shadow-lg">
-              <CardHeader className="bg-red-50 rounded-t-lg">
+              <CardHeader className="rounded-t-lg">
                 <CardTitle className="text-2xl text-red-800">Guest Registration</CardTitle>
                 <CardDescription className="text-red-700">Please fill out this form to add yourself to the wedding registry.</CardDescription>
               </CardHeader>
@@ -491,7 +491,7 @@ export default function WeddingRegistry() {
 
           <TabsContent value="guests">
             <Card className="border-0 shadow-lg">
-              <CardHeader className="bg-red-50 rounded-t-lg">
+              <CardHeader className="rounded-t-lg">
                 <CardTitle className="text-2xl text-red-800">Guest List & Connections</CardTitle>
                 <CardDescription className="text-red-700">
                   View all registered guests and their connections to the bride and groom.
@@ -642,7 +642,7 @@ export default function WeddingRegistry() {
 
           <TabsContent value="events">
             <Card className="border-0 shadow-lg">
-              <CardHeader className="bg-red-50 rounded-t-lg">
+              <CardHeader className="rounded-t-lg">
                 <CardTitle className="text-2xl text-red-800">Wedding Events</CardTitle>
                 <CardDescription className="text-red-700">Join us in celebrating our special moments</CardDescription>
               </CardHeader>
