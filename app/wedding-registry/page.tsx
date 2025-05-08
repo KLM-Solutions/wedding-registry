@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { toast } from "sonner"
 import { Toaster } from "@/components/ui/sonner"
-import { Heart, Users, UserPlus, Camera, Calendar, MapPin, Clock, X, CalendarDays, Phone } from "lucide-react"
+import { Heart, Users, UserPlus, Camera, Calendar, MapPin, Clock, X, CalendarDays, Phone, Download } from "lucide-react"
 import Image from "next/image"
 import {
   Dialog,
@@ -362,6 +362,25 @@ export default function WeddingRegistry() {
   const handleMouseUp = () => {
     setHearts(prev => prev.map(heart => ({ ...heart, isDragging: false })))
   }
+
+  const handleImageDownload = async (imageUrl: string) => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `guest-photo-${Date.now()}.jpg`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      toast.success("Image downloaded successfully!");
+    } catch (error) {
+      console.error('Error downloading image:', error);
+      toast.error("Failed to download image");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-100 via-red-50 to-red-200 relative overflow-hidden">
@@ -1028,7 +1047,19 @@ export default function WeddingRegistry() {
       <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
         <DialogContent className="w-[90%] max-w-[350px] mx-auto rounded-2xl">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-serif text-red-600">Full Image</DialogTitle>
+            <div className="flex items-center justify-between">
+              <DialogTitle className="text-2xl font-serif text-red-600">Full Image</DialogTitle>
+              {selectedImage && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleImageDownload(selectedImage)}
+                  className="hover:bg-red-50"
+                >
+                  <Download className="h-5 w-5 text-red-600" />
+                </Button>
+              )}
+            </div>
           </DialogHeader>
           {selectedImage && (
             <div className="relative w-full aspect-square">
