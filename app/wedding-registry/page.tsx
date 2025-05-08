@@ -86,6 +86,7 @@ export default function WeddingRegistry() {
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [locationInputValue, setLocationInputValue] = useState("")
   const [isGeneratingGhibli, setIsGeneratingGhibli] = useState(false)
+  const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const locationInputRef = useRef<HTMLInputElement>(null)
 
   const schedule: DaySchedule[] = [
@@ -973,7 +974,10 @@ export default function WeddingRegistry() {
             <div className="space-y-4">
               <div className="flex items-center space-x-4">
                 {selectedGuest.photo_url ? (
-                  <div className="relative w-16 h-16 rounded-full overflow-hidden">
+                  <div 
+                    className="relative w-16 h-16 rounded-full overflow-hidden cursor-pointer"
+                    onClick={() => setSelectedImage(selectedGuest.photo_url || null)}
+                  >
                     <Image
                       src={selectedGuest.photo_url}
                       alt={`Photo of ${selectedGuest.name}`}
@@ -1015,6 +1019,23 @@ export default function WeddingRegistry() {
                   <p className="text-sm italic text-gray-600">"{selectedGuest.message}"</p>
                 </div>
               )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Image Modal */}
+      <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
+        <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 bg-transparent border-none">
+          {selectedImage && (
+            <div className="relative w-full h-full">
+              <Image
+                src={selectedImage}
+                alt="Full size image"
+                width={1200}
+                height={1200}
+                className="w-full h-full object-contain rounded-lg"
+              />
             </div>
           )}
         </DialogContent>
