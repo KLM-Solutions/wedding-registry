@@ -1026,15 +1026,17 @@ export default function WeddingRegistry() {
 
       {/* Image Modal */}
       <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
-        <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 bg-transparent border-none">
+        <DialogContent className="w-[90%] max-w-[350px] mx-auto rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-serif text-red-600">Full Image</DialogTitle>
+          </DialogHeader>
           {selectedImage && (
-            <div className="relative w-full h-full">
+            <div className="relative w-full aspect-square">
               <Image
                 src={selectedImage}
                 alt="Full size image"
-                width={1200}
-                height={1200}
-                className="w-full h-full object-contain rounded-lg"
+                fill
+                className="object-contain rounded-lg"
               />
             </div>
           )}
