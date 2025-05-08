@@ -4,6 +4,8 @@ import { writeFile, mkdir } from "fs/promises"
 import { join } from "path"
 import { v4 as uuidv4 } from "uuid"
 import { existsSync } from "fs"
+import { OpenAI } from "openai"
+import { toFile } from "openai"
 
 // Initialize PostgreSQL connection pool
 const pool = new Pool({
@@ -107,16 +109,49 @@ export async function POST(request: NextRequest) {
     // Handle photo upload if present
     let photoUrl = null
     const photo = formData.get("photo") as File
+    const photoStyle = formData.get("photoStyle") as string
     
     if (photo && photo.size > 0) {
       try {
         // Convert image to base64
         const arrayBuffer = await photo.arrayBuffer()
         const buffer = Buffer.from(arrayBuffer)
-        photoUrl = `data:${photo.type};base64,${buffer.toString('base64')}`
-        console.log("Photo converted to base64 successfully")
+        const base64Image = buffer.toString('base64')
+        
+        if (photoStyle === "ghibli") {
+          // Call OpenAI API to generate Ghibli-style image
+          const openai = new OpenAI({
+            apiKey: process.env.OPENAI_API_KEY,
+          })
+
+          // Create a temporary file from the buffer
+          const tempFile = await toFile(buffer, null, {
+            type: photo.type,
+          })
+
+          // Generate Ghibli-style image
+          const response = await openai.images.edit({
+            model: "gpt-image-1",
+            image: tempFile,
+            prompt: "Transform this image into Studio Ghibli art style, maintaining the same pose and composition but with Ghibli's distinctive hand-drawn animation aesthetic, soft colors, and whimsical details.",
+          })
+
+          // Get the generated image data
+          if (response.data && response.data[0]?.b64_json) {
+            // Convert base64 to buffer and then to data URL
+            const imageBuffer = Buffer.from(response.data[0].b64_json, 'base64')
+            photoUrl = `data:image/jpeg;base64,${imageBuffer.toString('base64')}`
+          } else {
+            throw new Error('Failed to generate Ghibli-style image')
+          }
+        } else {
+          // Normal image processing
+          photoUrl = `data:${photo.type};base64,${base64Image}`
+        }
+        
+        console.log("Photo processed successfully")
       } catch (error) {
-        console.error("Error converting photo to base64:", error)
+        console.error("Error processing photo:", error)
         // Continue without photo if there's an error
       }
     }

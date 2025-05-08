@@ -72,6 +72,7 @@ export default function WeddingRegistry() {
     message: "",
     date_of_birth: "",
     location: "",
+    photoStyle: "normal",
   })
   const [photoFile, setPhotoFile] = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
@@ -84,6 +85,7 @@ export default function WeddingRegistry() {
   const [locationSuggestions, setLocationSuggestions] = useState<LocationSuggestion[]>([])
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [locationInputValue, setLocationInputValue] = useState("")
+  const [isGeneratingGhibli, setIsGeneratingGhibli] = useState(false)
   const locationInputRef = useRef<HTMLInputElement>(null)
 
   const schedule: DaySchedule[] = [
@@ -210,7 +212,7 @@ export default function WeddingRegistry() {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0]
       setPhotoFile(file)
@@ -221,6 +223,40 @@ export default function WeddingRegistry() {
         setPhotoPreview(reader.result as string)
       }
       reader.readAsDataURL(file)
+    }
+  }
+
+  const generateGhibliImage = async () => {
+    if (!photoFile) return
+
+    setIsGeneratingGhibli(true)
+    try {
+      const formData = new FormData()
+      formData.append('image', photoFile)
+
+      const response = await fetch('/api/image', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to generate Ghibli-style image')
+      }
+
+      const data = await response.json()
+      if (data.image) {
+        setPhotoPreview(`data:image/jpeg;base64,${data.image}`)
+        // Convert base64 to File object
+        const response = await fetch(`data:image/jpeg;base64,${data.image}`)
+        const blob = await response.blob()
+        const ghibliFile = new File([blob], 'ghibli-image.jpg', { type: 'image/jpeg' })
+        setPhotoFile(ghibliFile)
+      }
+    } catch (error) {
+      console.error('Error generating Ghibli-style image:', error)
+      toast.error('Failed to generate Ghibli-style image')
+    } finally {
+      setIsGeneratingGhibli(false)
     }
   }
 
@@ -257,7 +293,6 @@ export default function WeddingRegistry() {
       const response = await fetch("/api/wedding-registry", {
         method: "POST",
         body: formDataObj,
-        // Remove Content-Type header to let the browser set it with boundary for FormData
       })
 
       if (response.ok) {
@@ -273,6 +308,7 @@ export default function WeddingRegistry() {
           message: "",
           date_of_birth: "",
           location: "",
+          photoStyle: "normal",
         })
         setPhotoFile(null)
         setPhotoPreview(null)
@@ -601,25 +637,58 @@ export default function WeddingRegistry() {
                         <Camera className="w-4 h-4 mr-2" />
                         Photo (Optional)
                       </Label>
-                      <div className="flex items-center space-x-4">
-                        <div className="flex-1">
-                          <Input
-                            id="photo"
-                            name="photo"
-                            type="file"
-                            accept="image/*"
-                            onChange={handlePhotoChange}
-                            className="bg-white"
-                          />
+                      <div className="flex flex-col space-y-4">
+                        <div className="flex items-center space-x-4">
+                          <div className="flex-1">
+                            <div className="mb-4">
+                              <Label htmlFor="photoStyle" className="text-sm text-gray-600">Photo Style</Label>
+                              <Select
+                                onValueChange={(value) => setFormData(prev => ({ ...prev, photoStyle: value }))}
+                                value={formData.photoStyle}
+                              >
+                                <SelectTrigger className="bg-white">
+                                  <SelectValue placeholder="Select photo style" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="normal">Normal</SelectItem>
+                                  <SelectItem value="ghibli">Ghibli Style</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <Input
+                              id="photo"
+                              name="photo"
+                              type="file"
+                              accept="image/*"
+                              onChange={handlePhotoChange}
+                              className="bg-white"
+                            />
+                          </div>
+                          {photoPreview && (
+                            <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-red-200">
+                              <Image
+                                src={photoPreview}
+                                alt="Preview"
+                                fill
+                                style={{ objectFit: "cover" }}
+                              />
+                            </div>
+                          )}
                         </div>
                         {photoPreview && (
-                          <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-red-200">
-                            <Image
-                              src={photoPreview}
-                              alt="Preview"
-                              fill
-                              style={{ objectFit: "cover" }}
-                            />
+                          <div className="flex items-center space-x-4">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className="flex-1"
+                              onClick={() => {
+                                setPhotoFile(null)
+                                setPhotoPreview(null)
+                              }}
+                            >
+                              <X className="w-4 h-4 mr-2" />
+                              Remove Photo
+                            </Button>
                           </div>
                         )}
                       </div>
