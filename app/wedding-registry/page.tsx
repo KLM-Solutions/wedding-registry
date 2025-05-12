@@ -784,10 +784,10 @@ export default function WeddingRegistry() {
       {/* Add Popup Notification */}
       {popupNotification.show && popupNotification.guest && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-[90%] max-w-md">
-          <div className="bg-white rounded-lg shadow-lg p-4 animate-slide-down">
+          <div className="bg-gradient-to-r from-rose-100 via-red-50 to-rose-100 rounded-lg shadow-lg p-4 animate-slide-down border border-rose-200">
             <div className="flex items-center space-x-4">
               {popupNotification.guest.photo_url ? (
-                <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
+                <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-rose-200">
                   <Image
                     src={popupNotification.guest.photo_url}
                     alt={`Photo of ${popupNotification.guest.name}`}
@@ -796,13 +796,16 @@ export default function WeddingRegistry() {
                   />
                 </div>
               ) : (
-                <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center flex-shrink-0 ring-2 ring-rose-200">
                   <span className="text-xl font-medium text-gray-500">{popupNotification.guest.name.charAt(0)}</span>
                 </div>
               )}
               <div className="flex-1 min-w-0">
                 <h4 className="font-semibold text-gray-900 truncate">{popupNotification.guest.name}</h4>
-                <p className="text-sm text-gray-600 truncate">{popupNotification.guest.location || 'Location not provided'}</p>
+                <p className="text-sm text-gray-600 truncate flex items-center">
+                  <MapPin className="w-3 h-3 mr-1" />
+                  {popupNotification.guest.location || 'Location not provided'}
+                </p>
               </div>
             </div>
           </div>
