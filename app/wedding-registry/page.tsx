@@ -79,6 +79,12 @@ interface VerifiedGuest {
   roomAssignment: RoomAssignment;
 }
 
+// Add new interface for popup notification
+interface PopupNotification {
+  guest: Guest | null
+  show: boolean
+}
+
 export default function WeddingRegistry() {
   const [formData, setFormData] = useState({
     name: "",
@@ -116,6 +122,8 @@ export default function WeddingRegistry() {
   const audioBuffersRef = useRef<Float32Array[]>([])
   const [verifiedGuests, setVerifiedGuests] = useState<VerifiedGuest[]>([])
   const [passcode, setPasscode] = useState("")
+  const [popupNotification, setPopupNotification] = useState<PopupNotification>({ guest: null, show: false })
+  const [expandedGuestId, setExpandedGuestId] = useState<number | null>(null)
 
   const schedule: DaySchedule[] = [
     {
@@ -763,8 +771,44 @@ export default function WeddingRegistry() {
     }
   };
 
+  // Add function to handle popup notification
+  const showPopupNotification = (guest: Guest) => {
+    setPopupNotification({ guest, show: true })
+    setTimeout(() => {
+      setPopupNotification(prev => ({ ...prev, show: false }))
+    }, 5000)
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-100 via-red-50 to-red-200 relative overflow-hidden">
+      {/* Add Popup Notification */}
+      {popupNotification.show && popupNotification.guest && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-[90%] max-w-md">
+          <div className="bg-white rounded-lg shadow-lg p-4 animate-slide-down">
+            <div className="flex items-center space-x-4">
+              {popupNotification.guest.photo_url ? (
+                <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
+                  <Image
+                    src={popupNotification.guest.photo_url}
+                    alt={`Photo of ${popupNotification.guest.name}`}
+                    fill
+                    style={{ objectFit: "cover" }}
+                  />
+                </div>
+              ) : (
+                <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                  <span className="text-xl font-medium text-gray-500">{popupNotification.guest.name.charAt(0)}</span>
+                </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <h4 className="font-semibold text-gray-900 truncate">{popupNotification.guest.name}</h4>
+                <p className="text-sm text-gray-600 truncate">{popupNotification.guest.location || 'Location not provided'}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Movable Hearts Background */}
       <div 
         className="absolute inset-0 overflow-hidden"
@@ -1282,8 +1326,11 @@ export default function WeddingRegistry() {
                         .map((guest, index) => (
                           <div 
                             key={index} 
-                            className="p-4 border rounded-lg bg-white shadow-sm cursor-pointer hover:shadow-md transition-shadow duration-200"
-                            onClick={() => setSelectedGuest(guest)}
+                            className="p-4 border rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer"
+                            onClick={() => {
+                              showPopupNotification(guest)
+                              setExpandedGuestId(expandedGuestId === guest.id ? null : guest.id)
+                            }}
                           >
                             <div className="flex flex-col items-center text-center space-y-3">
                               {guest.photo_url ? (
@@ -1301,6 +1348,17 @@ export default function WeddingRegistry() {
                                 </div>
                               )}
                               <h4 className="font-semibold text-lg">{guest.name}</h4>
+                              {expandedGuestId === guest.id && (
+                                <div 
+                                  className="text-red-600 hover:text-red-700 text-sm font-medium transition-colors"
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    setSelectedGuest(guest)
+                                  }}
+                                >
+                                  View Details
+                                </div>
+                              )}
                             </div>
                           </div>
                         ))}
@@ -1575,3 +1633,21 @@ export default function WeddingRegistry() {
     </div>
   )
 }
+
+// Add this CSS animation to your global styles or tailwind config
+const styles = `
+@keyframes slide-down {
+  0% {
+    transform: translate(-50%, -100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-down {
+  animation: slide-down 0.3s ease-out forwards;
+}
+`
