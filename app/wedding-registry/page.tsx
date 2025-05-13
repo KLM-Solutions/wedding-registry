@@ -1251,63 +1251,39 @@ export default function WeddingRegistry() {
                 <div className="mb-8">
                   <h3 className="text-xl font-semibold mb-4">Family Connections</h3>
                   <div className="bg-white p-4 rounded-lg shadow-sm overflow-auto">
-                    <div className="min-w-[800px]">
-                      <div className="flex justify-center gap-40 mb-8">
+                    <div className="min-w-[800px] md:min-w-0">
+                      <div className="grid grid-cols-10 gap-2 md:gap-4">
                         {/* Bride Side */}
-                        <div className="text-center">
-                          <div 
-                            className={`w-32 h-32 mx-auto mb-2 rounded-full bg-red-100 flex items-center justify-center animate-float cursor-pointer transition-all duration-200 ${selectedConnection?.name === 'Harini' ? 'ring-4 ring-red-400' : ''}`}
-                            onClick={() => setSelectedConnection(selectedConnection?.name === 'Harini' ? null : {name: 'Harini', side: 'bride'})}
-                          >
-                            <span className="text-2xl font-bold text-red-600">Harini</span>
+                        {["Kalyani", "Kalyan", "Anjan", "Raji", "Harini"].map((name) => (
+                          <div key={name} className="text-center">
+                            <div 
+                              className={`w-12 h-12 md:w-16 md:h-16 mx-auto mb-2 rounded-full bg-red-50 flex items-center justify-center hover:scale-110 transition-transform duration-200 cursor-pointer ${selectedConnection?.name === name ? 'ring-4 ring-red-400' : ''}`}
+                              onClick={() => setSelectedConnection(selectedConnection?.name === name ? null : {name, side: 'bride'})}
+                            >
+                              <span className="text-xs md:text-sm font-medium text-red-600">{name}</span>
+                            </div>
+                            <p className="text-[10px] md:text-xs text-slate-600">
+                              {guestList.filter((g) => g.association === "bride" && g.connection === name).length}{" "}
+                              guests
+                            </p>
                           </div>
-                          <p className="font-semibold text-slate-800">Bride</p>
-
-                          <div className="mt-8 grid grid-cols-5 gap-4">
-                            {["Kalyani", "Kalyan", "Anjan", "Raji", "Harini"].map((name) => (
-                              <div key={name} className="text-center">
-                                <div 
-                                  className={`w-16 h-16 mx-auto mb-2 rounded-full bg-red-50 flex items-center justify-center hover:scale-110 transition-transform duration-200 cursor-pointer ${selectedConnection?.name === name ? 'ring-4 ring-red-400' : ''}`}
-                                  onClick={() => setSelectedConnection(selectedConnection?.name === name ? null : {name, side: 'bride'})}
-                                >
-                                  <span className="text-sm font-medium text-red-600">{name}</span>
-                                </div>
-                                <p className="text-xs text-slate-600">
-                                  {guestList.filter((g) => g.association === "bride" && g.connection === name).length}{" "}
-                                  guests
-                                </p>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
+                        ))}
 
                         {/* Groom Side */}
-                        <div className="text-center">
-                          <div 
-                            className={`w-32 h-32 mx-auto mb-2 rounded-full bg-red-100 flex items-center justify-center animate-float-delayed cursor-pointer transition-all duration-200 ${selectedConnection?.name === 'Aditya' ? 'ring-4 ring-red-400' : ''}`}
-                            onClick={() => setSelectedConnection(selectedConnection?.name === 'Aditya' ? null : {name: 'Aditya', side: 'groom'})}
-                          >
-                            <span className="text-2xl font-bold text-red-600">Aditya</span>
+                        {["Ramesh", "Sushma", "Nirupama", "Abhijit", "Aditya"].map((name) => (
+                          <div key={name} className="text-center">
+                            <div 
+                              className={`w-12 h-12 md:w-16 md:h-16 mx-auto mb-2 rounded-full bg-red-50 flex items-center justify-center hover:scale-110 transition-transform duration-200 cursor-pointer ${selectedConnection?.name === name ? 'ring-4 ring-red-400' : ''}`}
+                              onClick={() => setSelectedConnection(selectedConnection?.name === name ? null : {name, side: 'groom'})}
+                            >
+                              <span className="text-xs md:text-sm font-medium text-red-600">{name}</span>
+                            </div>
+                            <p className="text-[10px] md:text-xs text-slate-600">
+                              {guestList.filter((g) => g.association === "groom" && g.connection === name).length}{" "}
+                              guests
+                            </p>
                           </div>
-                          <p className="font-semibold text-slate-800">Groom</p>
-
-                          <div className="mt-8 grid grid-cols-5 gap-4">
-                            {["Ramesh", "Sushma", "Nirupama", "Abhijit", "Aditya"].map((name) => (
-                              <div key={name} className="text-center">
-                                <div 
-                                  className={`w-16 h-16 mx-auto mb-2 rounded-full bg-red-50 flex items-center justify-center hover:scale-110 transition-transform duration-200 cursor-pointer ${selectedConnection?.name === name ? 'ring-4 ring-red-400' : ''}`}
-                                  onClick={() => setSelectedConnection(selectedConnection?.name === name ? null : {name, side: 'groom'})}
-                                >
-                                  <span className="text-sm font-medium text-red-600">{name}</span>
-                                </div>
-                                <p className="text-xs text-slate-600">
-                                  {guestList.filter((g) => g.association === "groom" && g.connection === name).length}{" "}
-                                  guests
-                                </p>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
+                        ))}
                       </div>
                     </div>
                   </div>
